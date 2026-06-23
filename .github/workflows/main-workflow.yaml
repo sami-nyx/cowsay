@@ -12,10 +12,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build image
-        run: docker build -t cowsay:v1.0 .
+        run: docker build -t cowsay:${{ github.ref_name }} .
 
-      - name: list images
+      - name: List images
         run: echo "$(docker images)"
       
+      - name: Run container from the created image
+        run: docker run -p 80:8080 cowsay:${{ github.ref_name }} 
+      
+      - name: Test the container
+        run: echo $(curl localhost:80)
       - name: print commit tag
         run: echo "Triggered By tag:${{ github.ref_name }}" 
