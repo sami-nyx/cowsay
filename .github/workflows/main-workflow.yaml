@@ -2,9 +2,20 @@ on:
   push:
     branches:
       - main
+    
 jobs:
-  print-hello:
+  
+  build-and-test:
     runs-on: ubuntu-24.04
     steps:
-      - name: Print hello world
-        run: echo "hello world"
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t cowsay:v1.0 
+
+      - name: list images
+        run: echo "$(docker images)"
+      
+      - name: print commit tag
+        run: echo "Triggered By tag:${{ github.ref_name }} "
