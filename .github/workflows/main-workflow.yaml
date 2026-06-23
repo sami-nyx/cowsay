@@ -23,7 +23,7 @@ jobs:
           docker run -d \
             --name cowsay \
             -p 80:8080 \
-            --health-cmd="curl -f http://localhost:8080/ || exit 1" \
+            --health-cmd="curl -f http://localhost:80/ || exit 1" \
             --health-interval=2s \
             --health-retries=10 \
             cowsay:${{ github.ref_name }}
