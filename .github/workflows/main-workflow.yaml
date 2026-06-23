@@ -16,11 +16,24 @@ jobs:
 
       - name: List images
         run: echo "$(docker images)"
-      
       - name: Run container from the created image
-        run: docker run -d -p 80:8080 cowsay:${{ github.ref_name }} 
-      
+        run: |
+          docker run -d \
+            --name cowsay \
+            -p 80:8080 \
+            --health-cmd="curl -f http://localhost:8080/ || exit 1" \
+            --health-interval=2s \
+            --health-retries=10 \
+            cowsay:${{ github.ref_name }}
+
+      - name: Wait for container to be healthy
+        run: |
+          echo "Waiting for container to start up..."
+          until [ "$(docker inspect --format='{{.State.Health.Status}}' cowsay)" == "healthy" ]; do
+            echo "Still initializing..."
+            sleep 1
+          done
+          echo "Container is up and running!"
+
       - name: Test the container 
-        run: echo $(curl localhost:80)
-      - name: print commit tag 
-        run: echo "Triggered By tag:${{ github.ref_name }}" 
+        run: curl -v localhost:80
