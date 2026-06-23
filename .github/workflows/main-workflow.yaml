@@ -23,19 +23,26 @@ jobs:
           docker run -d \
             --name cowsay \
             -p 80:8080 \
-            --health-cmd="curl -f http://localhost:80/ || exit 1" \
-            --health-interval=2s \
-            --health-retries=10 \
             cowsay:${{ github.ref_name }}
-
-      - name: Wait for container to be healthy
-        run: 
-            sleep 10
-      - name: Print container state
-        run: echo "$(docker inspect --format='{{.State.Health.Status}}' cowsay)"
+      
+      - name: Wait for the application to be ready
+        run: |
+          echo "Waiting for cowsay to wake up on port 80..."
+          for i in {1..10}; do
+            # curl the host port (80) directly from the runner
+            if curl -s http://localhost:80 > /dev/null; then
+              echo "✅ Container is responding perfectly!"
+              exit 0
+            fi
+            echo "Container starting up... sleeping 1s"
+            sleep 1
+          done
+          echo "❌ Container failed to respond on time."
+          docker logs cowsay
+          exit 1
 
       - name: Test image
-        run: echo $(docker ps)
+        run: echo $(curl localhost:80)
           
       - name: Test the container 
         run: curl -v localhost:80
