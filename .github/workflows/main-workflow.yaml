@@ -20,7 +20,7 @@ jobs:
       - name: Run container from the created image
         run: docker run -d -p 80:8080 cowsay:${{ github.ref_name }} 
       
-      - name: Test the container
+      - name: Test the container 
         run: echo $(curl localhost:80)
       - name: print commit tag 
         run: echo "Triggered By tag:${{ github.ref_name }}" 
