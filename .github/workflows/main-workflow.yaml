@@ -31,6 +31,9 @@ jobs:
       - name: Wait for container to be healthy
         run: 
             sleep 10
+      - name: Print container state
+        run: echo "$(docker inspect --format='{{.State.Health.Status}}' cowsay)"
+
       - name: Test image
         run: echo $(docker ps)
           
