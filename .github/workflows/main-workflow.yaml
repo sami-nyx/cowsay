@@ -18,7 +18,7 @@ jobs:
         run: echo "$(docker images)"
       
       - name: Run container from the created image
-        run: docker run -p 80:8080 cowsay:${{ github.ref_name }} 
+        run: docker run -d -p 80:8080 cowsay:${{ github.ref_name }} 
       
       - name: Test the container
         run: echo $(curl localhost:80)
