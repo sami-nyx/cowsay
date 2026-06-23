@@ -22,5 +22,5 @@ jobs:
       
       - name: Test the container
         run: echo $(curl localhost:80)
-      - name: print commit tag
+      - name: print commit tag 
         run: echo "Triggered By tag:${{ github.ref_name }}" 
