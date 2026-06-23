@@ -35,5 +35,5 @@ jobs:
           done
           echo "Container is up and running!"
 
-      - name: Test the container  
+      - name: Test the container 
         run: curl -v localhost:80
