@@ -14,39 +14,39 @@ jobs:
       contents: read
     steps:
     
-      # - name: Checkout code
-      #   uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      # - name: Build image
-      #   run: docker build -t cowsay:${{ github.ref_name }} .
+      - name: Build image
+        run: docker build -t cowsay:${{ github.ref_name }} .
 
-      # - name: List images
-      #   run: echo "$(docker images)"
-      # - name: Run container from the created image
-      #   run: |
-      #     docker run -d \
-      #       --name cowsay \
-      #       -p 80:8080 \
-      #       cowsay:${{ github.ref_name }}
+      - name: List images
+        run: echo "$(docker images)"
+      - name: Run container from the created image
+        run: |
+          docker run -d \
+            --name cowsay \
+            -p 80:8080 \
+            cowsay:${{ github.ref_name }}
       
-      # - name: Wait for the application to be ready
-      #   run: |
-      #     echo "Waiting for cowsay to wake up on port 80..."
-      #     for i in {1..10}; do
-      #       # curl the host port (80) directly from the runner
-      #       if curl -s http://localhost:80 > /dev/null; then
-      #         echo "✅ Container is responding perfectly!"
-      #         exit 0
-      #       fi
-      #       echo "Container starting up... sleeping 1s"
-      #       sleep 1
-      #     done
-      #     echo "❌ Container failed to respond on time."
-      #     docker logs cowsay
-      #     exit 1
+      - name: Wait for the application to be ready
+        run: |
+          echo "Waiting for cowsay to wake up on port 80..."
+          for i in {1..10}; do
+            # curl the host port (80) directly from the runner
+            if curl -s http://localhost:80 > /dev/null; then
+              echo "✅ Container is responding perfectly!"
+              exit 0
+            fi
+            echo "Container starting up... sleeping 1s"
+            sleep 1
+          done
+          echo "❌ Container failed to respond on time."
+          docker logs cowsay
+          exit 1
 
-      # - name: Test image
-      #   run: echo $(curl localhost:80)
+      - name: Test image
+        run: echo $(curl localhost:80)
           
       - name: Test the container 
         run: echo "===============================done part 0ne============================================"
