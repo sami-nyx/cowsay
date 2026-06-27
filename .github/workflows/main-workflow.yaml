@@ -52,10 +52,11 @@ jobs:
         run: echo "===============================done part 0ne============================================"
   # Step 1: Request temporary AWS credentials using the OIDC token
       - name: Configure AWS Credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: arn:aws:iam::889867978066:role/github-actions-ecr-push-role
           aws-region: ap-south-1 
+          disable-retry: true 
 
       - name: Login to Amazon ECR
         id: login-ecr
