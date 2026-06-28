@@ -50,7 +50,7 @@ jobs:
       - name: Claculate next tag
         id: versioning
         env:
-          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           CURRENT_PATCH: ${{ vars.PATCH }}     
         run: |
           NEXT_PATCH=$(( CURRENT_PATCH + 1 ))
