@@ -12,6 +12,7 @@ jobs:
     permissions:
       id-token: write 
       contents: read
+      : write
     steps:
     
       - name: Checkout code
@@ -47,15 +48,33 @@ jobs:
 
       - name: Test image
         run: echo $(curl localhost:80)
-      - name: Claculate next tag
+      - name: Calculate and Push Next Version Tag
         id: versioning
-        env:
-          GH_TOKEN: ${{ github.token }}
-          CURRENT_PATCH: ${{ vars.PATCH }}     
         run: |
-          NEXT_PATCH=$(( CURRENT_PATCH + 1 ))
-          gh variable set PATCH --body "$NEXT_PATCH"
-
+          # 1. Find the latest tag. If no tags exist yet, default to v1.0.0
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v1.0.0")
+          echo "Current latest tag in repo: $LATEST_TAG"
+          
+          # 2. Extract the numbers (strips the 'v' first)
+          VERSION=${LATEST_TAG#v}
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
+          
+          # 3. Calculate the next patch number safely in Bash
+          NEXT_PATCH=$((PATCH + 1))
+          NEW_TAG="v$MAJOR.$MINOR.$NEXT_PATCH"
+          echo "Calculated new tag: $NEW_TAG"
+          
+          # 4. Save the new tag to GITHUB_ENV so downstream steps can use it
+          echo "IMAGE_TAG=$NEW_TAG" >> $GITHUB_ENV
+          
+          # 5. Securely push the new tag back to GitHub using the native bot profile
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+          
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -71,7 +90,6 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cowsay
-          IMAGE_TAG: "v${{ vars.MAJOR }}.{{ vars.MINOR }}.{{ vars.PATCH }}"
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
