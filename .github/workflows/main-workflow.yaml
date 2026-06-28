@@ -47,10 +47,15 @@ jobs:
 
       - name: Test image
         run: echo $(curl localhost:80)
-          
-      - name: Test the container 
-        run: echo "===============================done part 0ne============================================"
-  # Step 1: Request temporary AWS credentials using the OIDC token
+      - name: Claculate next tag
+        id: versioning
+        env:
+          GH_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          CURRENT_PATCH: ${{ vars.PATCH }}     
+        run: |
+          NEXT_PATCH=$(( CURRENT_PATCH + 1 ))
+          gh variable set PATCH --body "$NEXT_PATCH"
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -66,7 +71,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: cowsay
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: "v${{ vars.MAJOR }}.{{ vars.MINOR }}.{{ vars.PATCH }}"
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
