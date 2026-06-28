@@ -12,7 +12,6 @@ jobs:
     permissions:
       id-token: write 
       contents: read
-      : write
     steps:
     
       - name: Checkout code
@@ -74,7 +73,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag $NEW_TAG
           git push origin $NEW_TAG
-          
+
       - name: Configure AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v6
         with:
